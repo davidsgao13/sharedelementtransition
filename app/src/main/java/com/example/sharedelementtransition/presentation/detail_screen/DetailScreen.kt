@@ -1,5 +1,9 @@
 package com.example.sharedelementtransition.presentation.detail_screen
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,10 +21,12 @@ import androidx.compose.ui.unit.dp
  * Composable view for showing the details of a specific element picked from the ListScreen.
  */
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DetailScreen(
+fun SharedTransitionScope.DetailScreen(
     resId: Int,
-    text: String = ""
+    text: String = "",
+    animatedVisibilityScope : AnimatedVisibilityScope
 ) {
     Column(
         modifier = Modifier
@@ -34,11 +40,28 @@ fun DetailScreen(
             modifier = Modifier
                 .aspectRatio(16 / 9f)
                 .weight(1f)
+                .sharedElement(
+                    // This must be the same key as the one in the ListScreen
+                    state = rememberSharedContentState(key = "image/$resId"),
+                    // Pass in an animation for the AnimatedVisibilityScope
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = { _, _ ->
+                        tween(durationMillis = 1000)
+                    }
+                )
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = text,
             modifier = Modifier.weight(1f)
+                .sharedElement(
+                    state = rememberSharedContentState(key = "text/$text"),
+                    // Pass in an animation for the AnimatedVisibilityScope
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = { _, _ ->
+                        tween(durationMillis = 1000)
+                    }
+                )
         )
     }
 }
